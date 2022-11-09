@@ -20,7 +20,7 @@ router.get('/products/:id', async (req, res) => {
   }
 
   try {
-    const product = await prisma.product.findFirst({ where: { id: +_id } });
+    const product = await prisma.product.findFirst({ where: { id: _id } });
     if (!product) res.status(404).send();
     else {
       res.status(200).send(product);
@@ -39,6 +39,25 @@ router.post('/new/product', async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send(err.toString());
+  }
+});
+
+// delete single product by id
+router.delete('/products/:id', async (req, res) => {
+  //convert id from string to number
+  const _id = +req.params.id;
+
+  if (isNaN(_id)) {
+    res.status(400).send({ Error: 'Invalid id' });
+    return;
+  }
+
+  try {
+    const product = await prisma.product.delete({ where: { id: _id } });
+    res.status(200).send(product);
+  } catch (error) {
+    if (error.code === 'P2025') res.status(404).send();
+    else res.status(500).send(error.toString());
   }
 });
 
