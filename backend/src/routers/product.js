@@ -1,6 +1,7 @@
 const prisma = require('../db/prisma');
 const express = require('express');
 const productValidationSchema = require('../utils/productValidationSchema');
+const validUpdate = require('../utils/validUpdate');
 const router = new express.Router();
 
 // get all products from the database
@@ -39,6 +40,28 @@ router.post('/new/product', async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send(err.toString());
+  }
+});
+
+// update single product by id
+router.patch('/products/:id', async (req, res) => {
+  //convert id from string to number
+  const _id = +req.params.id;
+
+  if (isNaN(_id)) {
+    res.status(400).send({ Error: 'Invalid id' });
+    return;
+  }
+
+  if (!validUpdate(req)) return res.status(400).send({ Error: 'Invalid updates' });
+
+  try {
+    const product = await prisma.product.update({ where: { id: _id }, data: req.body });
+    res.status(201).send(product);
+  } catch (error) {
+    console.log(error);
+    if (error.code === 'P2025') return res.status(404).send();
+    res.status(500).send(error.toString());
   }
 });
 
