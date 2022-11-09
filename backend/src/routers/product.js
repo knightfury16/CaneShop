@@ -9,6 +9,27 @@ router.get('/products', async (req, res) => {
   res.status(200).send(products);
 });
 
+// get single product by id
+router.get('/products/:id', async (req, res) => {
+  //convert id from string to number
+  const _id = +req.params.id;
+
+  if (isNaN(_id)) {
+    res.status(400).send({ Error: 'Invalid id' });
+    return;
+  }
+
+  try {
+    const product = await prisma.product.findFirst({ where: { id: +_id } });
+    if (!product) res.status(404).send();
+    else {
+      res.status(200).send(product);
+    }
+  } catch (error) {
+    res.status(500).send(error.toString());
+  }
+});
+
 // create product
 router.post('/new/product', async (req, res) => {
   try {
