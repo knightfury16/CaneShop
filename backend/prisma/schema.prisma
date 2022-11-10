@@ -62,3 +62,22 @@ enum Category {
   OUTDOORS
   HOME
 }
+
+model User {
+  id          String    @id @default(uuid())
+  FirstName   String    @db.VarChar(50)
+  LastName    String    @db.VarChar(50)
+  Email       String    @unique
+  PhoneNum    String
+  DateOfBirth DateTime?
+  Password    String
+  Gender      String
+  Address     String
+  role        Role      @default(BUYER)
+}
+
+enum Role {
+  ADMIN
+  SELLER
+  BUYER
+}
