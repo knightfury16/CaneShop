@@ -69,7 +69,7 @@ model User {
   LastName    String    @db.VarChar(50)
   Email       String    @unique
   PhoneNum    String
-  DateOfBirth DateTime?
+  DateOfBirth String?
   Password    String
   Gender      String
   Address     String
