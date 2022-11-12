@@ -4,25 +4,14 @@ const prisma = require('./../db/prisma');
 
 //login user by searching email in the db and then comparing password has and password in db
 const login = async (req, res) => {
-  const { Email, Password } = req.body;
+  const { email, password } = req.body;
 
   try {
-    const user = await prisma.user.findFirst({ where: { Email } });
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    } else {
-      const isValid = await bcrypt.compare(Password, user.Password);
-
-      if (!isValid) {
-        res.status(400).json({ message: 'Invalid password' });
-      } else {
-        res.status(200).json({
-          message: 'User logged in successfully',
-          user
-        });
-      }
-    }
+    const user = await prisma.user.findFirst({ where: { email } });
+    if (!user) return res.status(404).send();
+    (await bcrypt.compare(password, user.password))
+      ? res.status(200).send(user)
+      : res.status(400).send({ Error: 'Invalid credentials.' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
