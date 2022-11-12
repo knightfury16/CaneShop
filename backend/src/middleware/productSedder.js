@@ -1,6 +1,14 @@
+const product = require("../../data/product.json");
 const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
+
+async function main() {
+    // ... you will write your Prisma Client queries here
+    await prisma.product.deleteMany({});
+    const products = await prisma.product.createMany({ data: product });
+    console.log(products);
+}
 
 main()
     .then(async () => {
