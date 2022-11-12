@@ -7,7 +7,6 @@ const auth = async (req, res, next) => {
     // const token = req.header("Authorization").replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    console.log('Decoded jwt :', decoded);
     const user = await prisma.user.findFirst({ where: { id: decoded.userId } });
     if (!user) throw new Error();
 
@@ -20,4 +19,15 @@ const auth = async (req, res, next) => {
   }
 };
 
-module.exports = auth;
+const authorizeRole = role => {
+  return (req, res, next) => {
+    if (role !== req.user.role) {
+      return res
+        .status(403)
+        .send({ Error: `Role ${req.user.role} is not allowed to access this resource` });
+    }
+    next();
+  };
+};
+
+module.exports = { auth, authorizeRole };
