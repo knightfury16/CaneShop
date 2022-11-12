@@ -5,13 +5,13 @@ const validUpdate = require('../utils/validUpdate');
 const router = new express.Router();
 
 // get all products from the database
-router.get('/products', async (req, res) => {
+router.get('/', async (req, res) => {
   const products = await prisma.product.findMany({});
   res.status(200).send(products);
 });
 
 // get single product by id
-router.get('/products/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
   //convert id from string to number
   const _id = +req.params.id;
 
@@ -32,7 +32,7 @@ router.get('/products/:id', async (req, res) => {
 });
 
 // create product
-router.post('/new/product', async (req, res) => {
+router.post('/new', async (req, res) => {
   try {
     const data = await productValidationSchema.validateAsync(req.body);
     const product = await prisma.product.create({ data });
@@ -44,7 +44,7 @@ router.post('/new/product', async (req, res) => {
 });
 
 // update single product by id
-router.patch('/products/:id', async (req, res) => {
+router.patch('/:id', async (req, res) => {
   //convert id from string to number
   const _id = +req.params.id;
 
@@ -66,7 +66,7 @@ router.patch('/products/:id', async (req, res) => {
 });
 
 // delete single product by id
-router.delete('/products/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
   //convert id from string to number
   const _id = +req.params.id;
 
