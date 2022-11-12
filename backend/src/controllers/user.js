@@ -99,9 +99,8 @@ const getAllUsers = async (req, res) => {
         if (role === "BUYER") {
             const users = await prisma.user.findMany();
             res.status(200).json(users);
-        }
-        else{
-            res.status(401).json({message:"Unauthorized"});
+        } else {
+            res.status(401).json({ message: "Unauthorized" });
         }
     } catch (error) {
         res.status(500).json({ message: error.message });

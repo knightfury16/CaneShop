@@ -13,7 +13,6 @@ const verify_Roles = (req, res, next) => {
         }
     } catch (error) {
         return res.status(500).json({ message: "something went wrong" });
-        
     }
 };
 
