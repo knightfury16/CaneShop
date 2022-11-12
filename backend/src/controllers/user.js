@@ -3,6 +3,7 @@ const generateToken = require('../utils/generateToken');
 const userValidationSchema = require('../utils/userValidationSchema');
 const prisma = require('./../db/prisma');
 
+// - login
 //login user by searching email in the db and then comparing password has and password in db
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -32,6 +33,7 @@ const login = async (req, res) => {
   }
 };
 
+// - Register
 //getting information from the c;ientr and creating a new user and storing in db
 const register = async (req, res) => {
   try {
@@ -65,6 +67,13 @@ const register = async (req, res) => {
     });
   }
 };
+
+// -logout
+const logout = async (req, res) => {
+  res.cookie('token', null, { expires: new Date(Date.now()), httpOnly: true });
+  res.status(200).send('logged out');
+};
+
 //getting all users from the db
 const getAllUsers = async (req, res) => {
   try {
@@ -126,5 +135,6 @@ module.exports = {
   register,
   getAllUsers,
   updateUserById,
-  deleteUserById
+  deleteUserById,
+  logout
 };
