@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const generateToken = require('../utils/generateToken');
 const userValidationSchema = require('../utils/userValidationSchema');
 const prisma = require('./../db/prisma');
 
@@ -7,11 +8,25 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // find user by email
     const user = await prisma.user.findFirst({ where: { email } });
     if (!user) return res.status(404).send();
-    (await bcrypt.compare(password, user.password))
-      ? res.status(200).send(user)
-      : res.status(400).send({ Error: 'Invalid credentials.' });
+
+    // compare password
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) res.status(400).send({ Error: 'Invalid credentials.' });
+
+    // generate token
+    const token = generateToken(user.id);
+
+    // set cookie, httpOnly important
+    res.cookie('token', token, {
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      httpOnly: true
+    });
+
+    // sending final response
+    res.status(200).send({ user, token });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -20,12 +35,28 @@ const login = async (req, res) => {
 //getting information from the c;ientr and creating a new user and storing in db
 const register = async (req, res) => {
   try {
+    // validate data
     const data = await userValidationSchema.validateAsync(req.body);
+
+    // hash password
     data.password = await bcrypt.hash(data.password, 10);
+
+    // create user
     const user = await prisma.user.create({ data });
+
+    // generate token
+    const token = generateToken(user.id);
+
+    // set cookie, httpOnly important
+    res.cookie('token', token, {
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      httpOnly: true
+    });
+
+    // final response
     res.status(201).json({
-      message: 'User created successfully',
-      user
+      user,
+      token
     });
   } catch (error) {
     if (error.code === 'P2002') return res.status(400).send({ Error: 'Email taken!' });
