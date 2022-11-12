@@ -64,20 +64,24 @@ enum Category {
 }
 
 model User {
-  id          String  @id @default(uuid())
-  FirstName   String  @db.VarChar(50)
-  LastName    String  @db.VarChar(50)
-  Email       String  @unique
-  PhoneNum    String
-  DateOfBirth String?
-  Password    String
-  Gender      String
-  Address     String
-  role        Role    @default(BUYER)
+
+  id                  Int       @id @default(autoincrement())
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  name                String    @db.VarChar(30)
+  email               String    @unique
+  password            String
+  role                Role      @default(BUYER)
+  phoneNum            String?
+  dateOfBirth         String?
+  gender              String?
+  address             String?
+  resetPasswordToken  String?
+  resetPasswordExpire DateTime?
+
 }
 
 enum Role {
   ADMIN
-  SELLER
   BUYER
 }
