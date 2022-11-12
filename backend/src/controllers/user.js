@@ -45,7 +45,7 @@ const register = async (req, res) => {
     });
   }
 };
-
+//getting all users from the db
 const getAllUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany();

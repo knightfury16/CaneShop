@@ -72,6 +72,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // create product
+
 router.post('/new', async (req, res) => {
   try {
     const data = await productValidationSchema.validateAsync(req.body);
@@ -96,7 +97,10 @@ router.patch('/:id', async (req, res) => {
   if (!validUpdate(req)) return res.status(400).send({ Error: 'Invalid updates' });
 
   try {
-    const product = await prisma.product.update({ where: { id: _id }, data: req.body });
+    const product = await prisma.product.update({
+      where: { id: _id },
+      data: req.body
+    });
     res.status(201).send(product);
   } catch (error) {
     console.log(error);
@@ -106,6 +110,7 @@ router.patch('/:id', async (req, res) => {
 });
 
 // delete single product by id
+
 router.delete('/:id', async (req, res) => {
   //convert id from string to number
   const _id = +req.params.id;
