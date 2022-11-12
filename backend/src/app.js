@@ -5,7 +5,7 @@ const userRoute = require("../src/routers/user");
 const productRouter = require("./routers/product")
 
 const app = express();
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 app.use(express.json());
 
 app.get("/", (req, res) => {

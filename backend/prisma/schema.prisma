@@ -64,6 +64,7 @@ enum Category {
 }
 
 model User {
+
   id                  Int       @id @default(autoincrement())
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
@@ -77,6 +78,7 @@ model User {
   address             String?
   resetPasswordToken  String?
   resetPasswordExpire DateTime?
+
 }
 
 enum Role {
