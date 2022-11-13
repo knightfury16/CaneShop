@@ -77,7 +77,7 @@ router.get('/:id', async (req, res) => {
 router.post('/new', auth, authorizeRole('ADMIN'), async (req, res) => {
   try {
     const data = await productValidationSchema.validateAsync(req.body);
-    const product = await prisma.product.create({ data });
+    const product = await prisma.product.create({ data: { userId: req.user.id, ...data } });
     res.status(201).send(product);
   } catch (err) {
     console.log(err);

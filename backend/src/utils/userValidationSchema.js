@@ -9,7 +9,8 @@ const userValidationSchema = Joi.object({
   phoneNum: Joi.string(),
   dateOfBirth: Joi.number().integer().min(2000).max(2010),
   gender: Joi.string().valid('Male', 'Female'),
-  address: Joi.string()
+  address: Joi.string(),
+  role: Joi.string().valid('ADMIN','BUYER')
 });
 
 module.exports = userValidationSchema;
