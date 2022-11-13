@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const generateToken = require('../utils/generateToken');
+const sendToken = require('../utils/sendToken');
 const userValidationSchema = require('../utils/userValidationSchema');
 const prisma = require('./../db/prisma');
 
@@ -17,17 +18,7 @@ const login = async (req, res) => {
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) res.status(400).send({ Error: 'Invalid credentials.' });
 
-    // generate token
-    const token = generateToken(user.id);
-
-    // set cookie, httpOnly important
-    res.cookie('token', token, {
-      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      httpOnly: true
-    });
-
-    // sending final response
-    res.status(200).send({ user, token });
+    sendToken(res, user, 200);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -46,20 +37,7 @@ const register = async (req, res) => {
     // create user
     const user = await prisma.user.create({ data });
 
-    // generate token
-    const token = generateToken(user.id);
-
-    // set cookie, httpOnly important
-    res.cookie('token', token, {
-      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      httpOnly: true
-    });
-
-    // final response
-    res.status(201).json({
-      user,
-      token
-    });
+    sendToken(res, user, 201);
   } catch (error) {
     if (error.code === 'P2002') return res.status(400).send({ Error: 'Email taken!' });
     res.status(500).json({
