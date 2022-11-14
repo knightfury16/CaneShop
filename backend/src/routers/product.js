@@ -1,10 +1,14 @@
-const prisma = require('../db/prisma');
 const express = require('express');
-const validUpdate = require('../utils/validUpdate');
 const router = new express.Router();
 const { auth, authorizeRole } = require('../middleware/auth');
 const { AUTHORIZED_ROLES } = require('../utils/constants');
-const { getAllProducts, getSingleProduct, createProduct, updateProduct } = require('../controllers/product');
+const {
+  getAllProducts,
+  getSingleProduct,
+  createProduct,
+  updateProduct,
+  deleteProduct
+} = require('../controllers/product');
 
 //** get all products from the database
 /* 
@@ -18,7 +22,7 @@ const { getAllProducts, getSingleProduct, createProduct, updateProduct } = requi
 router.get('/', auth, getAllProducts);
 
 //** get single product by id
-router.get('/:id',getSingleProduct);
+router.get('/:id', getSingleProduct);
 
 //** create product
 // !Auth2
@@ -30,22 +34,6 @@ router.patch('/:id', auth, authorizeRole(AUTHORIZED_ROLES), updateProduct);
 
 //** delete single product by id
 // !Auth2
-router.delete('/:id', auth, authorizeRole(AUTHORIZED_ROLES), async (req, res) => {
-  //convert id from string to number
-  const _id = +req.params.id;
-
-  if (isNaN(_id)) {
-    res.status(400).send({ Error: 'Invalid id' });
-    return;
-  }
-
-  try {
-    const product = await prisma.product.delete({ where: { id: _id } });
-    res.status(200).send(product);
-  } catch (error) {
-    if (error.code === 'P2025') res.status(404).send();
-    else res.status(500).send(error.toString());
-  }
-});
+router.delete('/:id', auth, authorizeRole(AUTHORIZED_ROLES), deleteProduct);
 
 module.exports = router;
