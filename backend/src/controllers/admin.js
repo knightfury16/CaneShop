@@ -1,4 +1,6 @@
-const prisma = require("../db/prisma");
+const Joi = require('joi');
+const prisma = require('../db/prisma');
+const { ALLOWED_ROLES } = require('../utils/constants');
 
 //** getting all users from the db -> api/admin/users
 const getAllUsers = async (req, res) => {
@@ -21,7 +23,7 @@ const getUser = async (req, res) => {
   }
   try {
     const user = await prisma.user.findFirst({ where: { id: _id } });
-    if (!user) res.status(404).send();
+    if (!user) return res.status(404).send();
     else {
       res.status(200).send(user);
     }
@@ -30,7 +32,31 @@ const getUser = async (req, res) => {
   }
 };
 
+// ** Update role of user -> api/admin/user/update/:id
+const updateRole = async (req, res) => {
+  //convert id from string to number
+  const _id = +req.params.id;
+  try {
+    const { role } = await Joi.object({
+      role: Joi.string()
+        .valid(...ALLOWED_ROLES)
+        .required()
+    }).validateAsync(req.body);
+
+    // search for user
+    const user = await prisma.user.findFirst({ where: { id: _id } });
+    if (!user) return res.status(404).send();
+
+    await prisma.user.update({ where: { id: _id }, data: { role } });
+
+    res.status(201).send({ Success: 'Ok' });
+  } catch (error) {
+    res.status(500).json({ Error: error.message });
+  }
+};
+
 module.exports = {
   getAllUsers,
-  getUser
-}
+  getUser,
+  updateRole
+};
