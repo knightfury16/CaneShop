@@ -19,7 +19,7 @@ const {
   -Get(/api/products?price=1-100) -> get all products where price is gte 1 and lte 100
   -Get(/api/products?page=2) -> get all products of page 2
 */
-router.get('/', auth, getAllProducts);
+router.get('/', getAllProducts);
 
 //** get single product by id
 router.get('/:id', getSingleProduct);
