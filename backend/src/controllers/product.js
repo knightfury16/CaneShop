@@ -1,6 +1,9 @@
 const prisma = require('../db/prisma');
 const { Category } = require('@prisma/client');
-const productValidationSchema = require('../utils/productValidationSchema');
+const {
+  productValidationSchema,
+  updateProductValidationSchema
+} = require('../utils/productValidationSchema');
 const validUpdate = require('../utils/validUpdate');
 const { ALLOWED_PRODUCT_UPDATE } = require('../utils/constants');
 
@@ -86,9 +89,10 @@ const updateProduct = async (req, res) => {
     return res.status(400).send({ Error: 'Invalid updates' });
 
   try {
+    const data = await updateProductValidationSchema.validateAsync(req.body);
     const product = await prisma.product.update({
       where: { id: _id },
-      data: req.body
+      data
     });
     res.status(201).send(product);
   } catch (error) {
@@ -114,7 +118,7 @@ const deleteProduct = async (req, res) => {
     if (error.code === 'P2025') res.status(404).send();
     else res.status(500).send(error.toString());
   }
-}
+};
 
 module.exports = {
   getAllProducts,
