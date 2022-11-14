@@ -32,7 +32,7 @@ const getUser = async (req, res) => {
   }
 };
 
-// ** Update role of user -> api/admin/user/update/:id
+// ** Update role of user -> api/admin/users/update/:id
 const updateRole = async (req, res) => {
   //convert id from string to number
   const _id = +req.params.id;
@@ -55,8 +55,25 @@ const updateRole = async (req, res) => {
   }
 };
 
+// ** Delete user -> api/admin/users/:id
+const deleteUser = async (req, res) => {
+  //convert id from string to number
+  const _id = +req.params.id;
+  try {
+    // search for user
+    const user = await prisma.user.findFirst({ where: { id: _id } });
+    if (!user) return res.status(404).send();
+
+    await prisma.user.delete({ where: { id: _id } });
+    res.status(202).send({ Success: 'Ok' });
+  } catch (error) {
+    res.status(500).json({ Error: error.message });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getUser,
-  updateRole
+  updateRole,
+  deleteUser
 };
