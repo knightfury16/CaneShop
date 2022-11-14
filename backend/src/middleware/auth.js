@@ -19,7 +19,7 @@ const auth = async (req, res, next) => {
   }
 };
 
-const authorizeRole = (...role) => {
+const authorizeRole = ([...role]) => {
   return (req, res, next) => {
     if (!role.includes(req.user.role)) {
       return res

@@ -1,11 +1,10 @@
 const prisma = require('../db/prisma');
 const express = require('express');
-const productValidationSchema = require('../utils/productValidationSchema');
 const validUpdate = require('../utils/validUpdate');
 const router = new express.Router();
 const { auth, authorizeRole } = require('../middleware/auth');
 const { AUTHORIZED_ROLES } = require('../utils/constants');
-const { getAllProducts, getSingleProduct } = require('../controllers/product');
+const { getAllProducts, getSingleProduct, createProduct } = require('../controllers/product');
 
 //** get all products from the database
 /* 
@@ -21,21 +20,12 @@ router.get('/', auth, getAllProducts);
 //** get single product by id
 router.get('/:id',getSingleProduct);
 
-// !Auth
-// create product
-router.post('/new', auth, authorizeRole(AUTHORIZED_ROLES), async (req, res) => {
-  try {
-    const data = await productValidationSchema.validateAsync(req.body);
-    const product = await prisma.product.create({ data: { userId: req.user.id, ...data } });
-    res.status(201).send(product);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send(err.toString());
-  }
-});
+//** create product
+// !Auth2
+router.post('/new', auth, authorizeRole(AUTHORIZED_ROLES), createProduct);
 
-// !Auth
-// update single product by id
+//** update single product by id
+// !Auth2
 router.patch('/:id', auth, authorizeRole(AUTHORIZED_ROLES), async (req, res) => {
   //convert id from string to number
   const _id = +req.params.id;
@@ -60,9 +50,8 @@ router.patch('/:id', auth, authorizeRole(AUTHORIZED_ROLES), async (req, res) => 
   }
 });
 
-// !Auth
-// delete single product by id
-
+//** delete single product by id
+// !Auth2
 router.delete('/:id', auth, authorizeRole(AUTHORIZED_ROLES), async (req, res) => {
   //convert id from string to number
   const _id = +req.params.id;

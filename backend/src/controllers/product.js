@@ -1,5 +1,6 @@
 const prisma = require("../db/prisma");
 const { Category } = require('@prisma/client');
+const productValidationSchema = require("../utils/productValidationSchema");
 
 //**  get all products from the database
 /* 
@@ -66,7 +67,19 @@ const getSingleProduct =  async (req, res) => {
     res.status(500).send(error.toString());
   }
 }
+
+
+const createProduct = async (req, res) => {
+  try {
+    const data = await productValidationSchema.validateAsync(req.body);
+    const product = await prisma.product.create({ data: { userId: req.user.id, ...data } });
+    res.status(201).send(product);
+  } catch (err) {
+    res.status(500).send(err.toString());
+  }
+}
 module.exports = {
   getAllProducts,
-  getSingleProduct
+  getSingleProduct,
+  createProduct
 }
