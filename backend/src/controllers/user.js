@@ -102,15 +102,6 @@ const updatePassword = async (req, res) => {
   }
 };
 
-//getting all users from the db
-const getAllUsers = async (req, res) => {
-  try {
-    const users = await prisma.user.findMany();
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
 //Update users information by searching for the user by email
 const updateUserById = async (req, res) => {
   const { Email } = req.params;
@@ -161,7 +152,6 @@ const deleteUserById = async (req, res) => {
 module.exports = {
   login,
   register,
-  getAllUsers,
   updateUserById,
   deleteUserById,
   logout,
