@@ -4,7 +4,7 @@ const sendToken = require('../utils/sendToken');
 const userValidationSchema = require('../utils/userValidationSchema');
 const prisma = require('./../db/prisma');
 
-// - login
+// ** login -> api/user/login
 //login user by searching email in the db and then comparing password has and password in db
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -24,7 +24,7 @@ const login = async (req, res) => {
   }
 };
 
-// - Register
+//** Register -> api/user/register
 //getting information from the c;ientr and creating a new user and storing in db
 const register = async (req, res) => {
   try {
@@ -46,10 +46,25 @@ const register = async (req, res) => {
   }
 };
 
-// -logout
+//** logout -> api/user/logout
 const logout = async (req, res) => {
   res.cookie('token', null, { expires: new Date(Date.now()), httpOnly: true });
   res.status(200).send('logged out');
+};
+
+//** user profile -> api/user/me
+const getUserProfile = async (req, res) => {
+  try {
+    const user = await prisma.user.findFirst({ where: { id: req.user.id } });
+
+    // delete password field from user body
+    delete user.password;
+
+    res.status(200).json({user})
+
+  } catch (error) {
+    res.status(500).json({Error: error.message})
+  }
 };
 
 //getting all users from the db
@@ -114,5 +129,6 @@ module.exports = {
   getAllUsers,
   updateUserById,
   deleteUserById,
-  logout
+  logout,
+  getUserProfile
 };
