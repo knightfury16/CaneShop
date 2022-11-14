@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { ALLOWED_ROLES } = require('./constants');
 
 const userValidationSchema = Joi.object({
   name: Joi.string().max(30).required(),
@@ -10,7 +11,7 @@ const userValidationSchema = Joi.object({
   dateOfBirth: Joi.number().integer().min(2000).max(2010),
   gender: Joi.string().valid('Male', 'Female'),
   address: Joi.string(),
-  role: Joi.string().valid('ADMIN','BUYER')
+  role: Joi.string().valid(...ALLOWED_ROLES)
 });
 
 module.exports = userValidationSchema;
