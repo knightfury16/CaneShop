@@ -3,7 +3,10 @@ const Joi = require('joi');
 const { ALLOWED_USER_UPDATE } = require('../utils/constants');
 const generateToken = require('../utils/generateToken');
 const sendToken = require('../utils/sendToken');
-const userValidationSchema = require('../utils/userValidationSchema');
+const {
+  userValidationSchema,
+  updateUserValidationSchema
+} = require('../utils/userValidationSchema');
 const validUpdate = require('../utils/validUpdate');
 const prisma = require('./../db/prisma');
 
@@ -106,18 +109,18 @@ const updatePassword = async (req, res) => {
 
 //** update user profile -> api/user/update/me
 const updateUserProfile = async (req, res) => {
-
   if (!validUpdate(req, ALLOWED_USER_UPDATE))
     return res.status(400).send({ Error: 'Invalid updates' });
 
   try {
+    const data = await updateUserValidationSchema.validateAsync(req.body);
     const user = await prisma.user.update({
       where: { id: req.user.id },
-      data: req.body
+      data
     });
     res.status(201).send(user);
   } catch (error) {
-    res.status(500).json({Error:error.message});
+    res.status(500).json({ Error: error.message });
   }
 };
 
