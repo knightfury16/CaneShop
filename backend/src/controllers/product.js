@@ -1,6 +1,8 @@
-const prisma = require("../db/prisma");
+const prisma = require('../db/prisma');
 const { Category } = require('@prisma/client');
-const productValidationSchema = require("../utils/productValidationSchema");
+const productValidationSchema = require('../utils/productValidationSchema');
+const validUpdate = require('../utils/validUpdate');
+const { ALLOWED_PRODUCT_UPDATE } = require('../utils/constants');
 
 //**  get all products from the database
 /* 
@@ -45,10 +47,10 @@ const getAllProducts = async (req, res) => {
     count: products.length,
     products
   });
-}
+};
 
 //** get single product by id */
-const getSingleProduct =  async (req, res) => {
+const getSingleProduct = async (req, res) => {
   //convert id from string to number
   const _id = +req.params.id;
 
@@ -66,8 +68,7 @@ const getSingleProduct =  async (req, res) => {
   } catch (error) {
     res.status(500).send(error.toString());
   }
-}
-
+};
 
 const createProduct = async (req, res) => {
   try {
@@ -77,9 +78,36 @@ const createProduct = async (req, res) => {
   } catch (err) {
     res.status(500).send(err.toString());
   }
-}
+};
+
+//** update single product by id
+const updateProduct = async (req, res) => {
+  //convert id from string to number
+  const _id = +req.params.id;
+
+  if (isNaN(_id)) {
+    res.status(400).send({ Error: 'Invalid id' });
+    return;
+  }
+
+  if (!validUpdate(req, ALLOWED_PRODUCT_UPDATE))
+    return res.status(400).send({ Error: 'Invalid updates' });
+
+  try {
+    const product = await prisma.product.update({
+      where: { id: _id },
+      data: req.body
+    });
+    res.status(201).send(product);
+  } catch (error) {
+    if (error.code === 'P2025') return res.status(404).send();
+    res.status(500).send(error.toString());
+  }
+};
+
 module.exports = {
   getAllProducts,
   getSingleProduct,
-  createProduct
-}
+  createProduct,
+  updateProduct
+};

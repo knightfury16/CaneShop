@@ -4,7 +4,7 @@ const validUpdate = require('../utils/validUpdate');
 const router = new express.Router();
 const { auth, authorizeRole } = require('../middleware/auth');
 const { AUTHORIZED_ROLES } = require('../utils/constants');
-const { getAllProducts, getSingleProduct, createProduct } = require('../controllers/product');
+const { getAllProducts, getSingleProduct, createProduct, updateProduct } = require('../controllers/product');
 
 //** get all products from the database
 /* 
@@ -26,29 +26,7 @@ router.post('/new', auth, authorizeRole(AUTHORIZED_ROLES), createProduct);
 
 //** update single product by id
 // !Auth2
-router.patch('/:id', auth, authorizeRole(AUTHORIZED_ROLES), async (req, res) => {
-  //convert id from string to number
-  const _id = +req.params.id;
-
-  if (isNaN(_id)) {
-    res.status(400).send({ Error: 'Invalid id' });
-    return;
-  }
-
-  if (!validUpdate(req)) return res.status(400).send({ Error: 'Invalid updates' });
-
-  try {
-    const product = await prisma.product.update({
-      where: { id: _id },
-      data: req.body
-    });
-    res.status(201).send(product);
-  } catch (error) {
-    console.log(error);
-    if (error.code === 'P2025') return res.status(404).send();
-    res.status(500).send(error.toString());
-  }
-});
+router.patch('/:id', auth, authorizeRole(AUTHORIZED_ROLES), updateProduct);
 
 //** delete single product by id
 // !Auth2
