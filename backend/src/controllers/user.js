@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const Joi = require('joi');
 const generateToken = require('../utils/generateToken');
 const sendToken = require('../utils/sendToken');
 const userValidationSchema = require('../utils/userValidationSchema');
@@ -16,7 +17,7 @@ const login = async (req, res) => {
 
     // compare password
     const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid) res.status(400).send({ Error: 'Invalid credentials.' });
+    if (!isValid) return res.status(400).send({ Error: 'Invalid credentials.' });
 
     sendToken(res, user, 200);
   } catch (error) {
@@ -52,7 +53,7 @@ const logout = async (req, res) => {
   res.status(200).send('logged out');
 };
 
-//** user profile -> api/user/me
+//** get user profile -> api/user/me
 const getUserProfile = async (req, res) => {
   try {
     const user = await prisma.user.findFirst({ where: { id: req.user.id } });
@@ -60,10 +61,44 @@ const getUserProfile = async (req, res) => {
     // delete password field from user body
     delete user.password;
 
-    res.status(200).json({user})
-
+    res.status(200).json({ user });
   } catch (error) {
-    res.status(500).json({Error: error.message})
+    res.status(500).json({ Error: error.message });
+  }
+};
+
+//**  update password -> api/user/password/update
+const updatePassword = async (req, res) => {
+  try {
+    // validating the request body
+    let { oldPassword, newPassword } = await Joi.object({
+      oldPassword: Joi.string()
+        .min(6)
+        .pattern(/^[a-zA-Z0-9]{3,30}$/)
+        .required(),
+      newPassword: Joi.string()
+        .min(6)
+        .pattern(/^[a-zA-Z0-9]{3,30}$/)
+        .required()
+    }).validateAsync(req.body);
+
+    // checking the old password
+    const isValid = await bcrypt.compare(oldPassword, req.user.password);
+    if (!isValid) return res.status(400).send({ Error: 'Invalid credentials.' });
+
+    // hashing new password
+    newPassword = await bcrypt.hash(newPassword, 10);
+
+    // setting the new password
+    const user = await prisma.user.update({
+      where: { id: req.user.id },
+      data: { password: newPassword }
+    });
+
+    // sending new token after updating password
+    sendToken(res, user, 201);
+  } catch (error) {
+    res.status(500).json({ Error: error.message });
   }
 };
 
@@ -130,5 +165,6 @@ module.exports = {
   updateUserById,
   deleteUserById,
   logout,
-  getUserProfile
+  getUserProfile,
+  updatePassword
 };

@@ -12,4 +12,7 @@ router.get('/getall', userController.getAllUsers);
 // !Auth1
 router.get('/me', auth, userController.getUserProfile);
 
+// ** update user password -> api/user/password/update
+router.post('/password/update', auth, userController.updatePassword);
+
 module.exports = router;
