@@ -1,8 +1,10 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
+const { ALLOWED_USER_UPDATE } = require('../utils/constants');
 const generateToken = require('../utils/generateToken');
 const sendToken = require('../utils/sendToken');
 const userValidationSchema = require('../utils/userValidationSchema');
+const validUpdate = require('../utils/validUpdate');
 const prisma = require('./../db/prisma');
 
 // ** login -> api/user/login
@@ -102,59 +104,28 @@ const updatePassword = async (req, res) => {
   }
 };
 
-//Update users information by searching for the user by email
-const updateUserById = async (req, res) => {
-  const { Email } = req.params;
-  const { FirstName, LastName, DateOfBirth, PhoneNum, Password, Address, Gender } = req.body;
-  const hashedPassword = await bcrypt.hash(Password, 10);
+//** update user profile -> api/user/update/me
+const updateUserProfile = async (req, res) => {
+
+  if (!validUpdate(req, ALLOWED_USER_UPDATE))
+    return res.status(400).send({ Error: 'Invalid updates' });
+
   try {
-    const user = await prisma.user.findFirst({ where: { Email } });
-    console.log(user);
-    if (!user) {
-      res.status(404).json({ message: 'User not found' });
-    } else {
-      const updatedUser = await prisma.user.update({
-        where: {
-          Email: Email
-        },
-        data: {
-          FirstName: FirstName,
-          LastName: LastName,
-          DateOfBirth: DateOfBirth,
-          PhoneNum: PhoneNum,
-          Password: hashedPassword,
-          Address: Address,
-          Gender: Gender
-        }
-      });
-      res.status(200).json({ message: 'User updated successfully', updatedUser });
-    }
+    const user = await prisma.user.update({
+      where: { id: req.user.id },
+      data: req.body
+    });
+    res.status(201).send(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-//Delete user by searching for the user by email
-const deleteUserById = async (req, res) => {
-  const { Email } = req.params;
-  try {
-    const user = await prisma.user.findFirst({ where: { Email } });
-    if (!user) {
-      res.status(404).json({ message: 'User not found' });
-    } else {
-      await prisma.user.delete({ where: { Email: Email } });
-      res.status(200).json({ message: 'User deleted successfully' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({Error:error.message});
   }
 };
 
 module.exports = {
   login,
   register,
-  updateUserById,
-  deleteUserById,
   logout,
+  updateUserProfile,
   getUserProfile,
   updatePassword
 };

@@ -11,6 +11,10 @@ router.get('/logout', userController.logout);
 // !Auth1
 router.get('/me', auth, userController.getUserProfile);
 
+// ** update user profile -> api/user/update/me
+// !Auth1
+router.post('/update/me', auth, userController.updateUserProfile);
+
 // ** update user password -> api/user/password/update
 // !Auth1
 router.post('/password/update', auth, userController.updatePassword);
