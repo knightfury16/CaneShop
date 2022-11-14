@@ -5,6 +5,7 @@ const validUpdate = require('../utils/validUpdate');
 const { Category } = require('@prisma/client');
 const router = new express.Router();
 const { auth, authorizeRole } = require('../middleware/auth');
+const { AUTHORIZED_ROLES } = require('../utils/constants');
 
 // get all products from the database
 /* 
@@ -74,7 +75,7 @@ router.get('/:id', async (req, res) => {
 
 // !Auth
 // create product
-router.post('/new', auth, authorizeRole('ADMIN'), async (req, res) => {
+router.post('/new', auth, authorizeRole(AUTHORIZED_ROLES), async (req, res) => {
   try {
     const data = await productValidationSchema.validateAsync(req.body);
     const product = await prisma.product.create({ data: { userId: req.user.id, ...data } });
@@ -87,7 +88,7 @@ router.post('/new', auth, authorizeRole('ADMIN'), async (req, res) => {
 
 // !Auth
 // update single product by id
-router.patch('/:id', auth, authorizeRole('ADMIN'), async (req, res) => {
+router.patch('/:id', auth, authorizeRole(AUTHORIZED_ROLES), async (req, res) => {
   //convert id from string to number
   const _id = +req.params.id;
 
@@ -114,7 +115,7 @@ router.patch('/:id', auth, authorizeRole('ADMIN'), async (req, res) => {
 // !Auth
 // delete single product by id
 
-router.delete('/:id', auth, authorizeRole('ADMIN'), async (req, res) => {
+router.delete('/:id', auth, authorizeRole(AUTHORIZED_ROLES), async (req, res) => {
   //convert id from string to number
   const _id = +req.params.id;
 
