@@ -39,6 +39,24 @@ exports.getSingleOrder = async (req, res) => {
   }
 };
 
+// * get all the orders of logged in user
+exports.getMyOrders = async (req, res) => {
+  console.log('from all my orders: ', req.user.id);
+  try {
+    const orders = await prisma.order.findMany({
+      where: { userId: +req.user.id },
+      include: { orderItems: true }
+    });
+
+    if (!orders) return res.status(404).send();
+
+    res.status(200).json({ orders });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ Error: error.message });
+  }
+};
+
 exports.getAllOrder = async (req, res) => {
   try {
     const orders = await prisma.order.findMany({ include: { orderItems: true } });
