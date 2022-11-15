@@ -1,5 +1,6 @@
 const prisma = require('../db/prisma');
 
+// * create new order
 exports.createNewOrder = async (req, res) => {
   try {
     // TODO: Add data validation
@@ -18,6 +19,23 @@ exports.createNewOrder = async (req, res) => {
     res.status(201).json({ order });
   } catch (error) {
     res.status(500).json({ Error: error.messgae });
+  }
+};
+
+// * get single order by id
+exports.getSingleOrder = async (req, res) => {
+  try {
+    const _id = +req.params.id;
+    const order = await prisma.order.findFirst({
+      where: { id: _id },
+      include: { orderItems: true }
+    });
+
+    if (!order) return res.status(404).send();
+
+    res.status(200).json({ order });
+  } catch (error) {
+    res.status(500).json({ Error: error.message });
   }
 };
 
