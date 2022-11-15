@@ -80,7 +80,7 @@ model Order {
   shippingAddress String
   user            User        @relation(fields: [userId], references: [id])
   userId          Int
-  oderItems       OrderItem[]
+  orderItems      OrderItem[]
   totalPrice      Float       @default(0)
   paidAt          DateTime?
   orderStatus     OrderStatus @default(Processing)
