@@ -71,9 +71,20 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// ** Get all orders -> api/admin/orders
+const getAllOrder = async (req, res) => {
+  try {
+    const orders = await prisma.order.findMany({ include: { orderItems: true } });
+    res.status(200).json({ orders });
+  } catch (error) {
+    res.status(500).json({ Error: error.message });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getUser,
   updateRole,
-  deleteUser
+  deleteUser,
+  getAllOrder
 };

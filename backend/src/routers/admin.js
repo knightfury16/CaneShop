@@ -1,5 +1,11 @@
 const express = require('express');
-const { getAllUsers, getUser, updateRole, deleteUser } = require('../controllers/admin');
+const {
+  getAllUsers,
+  getUser,
+  updateRole,
+  deleteUser,
+  getAllOrder
+} = require('../controllers/admin');
 const { auth, authorizeRole } = require('../middleware/auth');
 const { AUTHORIZED_ROLES } = require('../utils/constants');
 const router = express.Router();
@@ -19,5 +25,9 @@ router.post('/users/update/:id', auth, authorizeRole(AUTHORIZED_ROLES), updateRo
 // ** delete user by id -> api/admin/users/:id
 // !Auth2
 router.delete('/users/:id', auth, authorizeRole(AUTHORIZED_ROLES), deleteUser);
+
+// * get all orders -> api/admin/orders
+// !Auth2
+router.get('/orders', auth, authorizeRole(AUTHORIZED_ROLES), getAllOrder);
 
 module.exports = router;

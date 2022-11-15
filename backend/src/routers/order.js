@@ -21,7 +21,5 @@ router.get('/myOrders', auth, getMyOrders);
 router.get('/:id', auth, getSingleOrder);
 
 
-// * get all order
-router.get('/', getAllOrder);
 
 module.exports = router;
