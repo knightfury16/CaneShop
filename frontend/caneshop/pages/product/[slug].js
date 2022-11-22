@@ -5,7 +5,15 @@ import Layout from '../../components/Layout';
 import useStyles from '../../utils/style.js';
 import NextLink from 'next/link';
 import Image from 'next/image';
-import { Grid, Link, List, ListItem, Typography } from '@material-ui/core';
+import {
+    Grid,
+    Link,
+    List,
+    ListItem,
+    Typography,
+    Card,
+    Button,
+} from '@material-ui/core';
 
 export default function productScre() {
     const router = useRouter();
@@ -16,7 +24,7 @@ export default function productScre() {
         return <div>Product Not Found</div>;
     }
     return (
-        <Layout title={product.name}>
+        <Layout title={product.name} description= {product.description}>
             <div className={classes.section}>
                 <NextLink href="/" passHref>
                     <Link>
@@ -38,6 +46,11 @@ export default function productScre() {
                 <Grid item md={3} xs={12}>
                     <List>
                         <ListItem>
+                            <Typography component="h1">
+                                {product.name}
+                            </Typography>
+                        </ListItem>
+                        <ListItem>
                             <Typography>
                                 Catagory: {product.category}
                             </Typography>
@@ -54,6 +67,48 @@ export default function productScre() {
                             </Typography>
                         </ListItem>
                     </List>
+                </Grid>
+
+                <Grid item md={3} xs={12}>
+                    <Card>
+                        <List>
+                            <ListItem>
+                                <Grid container>
+                                    <Grid item xs={6}>
+                                        <Typography>Bid: </Typography>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <Typography>
+                                            ${product.price}
+                                        </Typography>
+                                    </Grid>
+                                </Grid>
+                            </ListItem>
+                            <ListItem>
+                                <Grid container>
+                                    <Grid item xs={6}>
+                                        <Typography>Status: </Typography>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <Typography>
+                                            {product.countInStock > 0
+                                                ? 'In Bid'
+                                                : 'SOLD'}
+                                        </Typography>
+                                    </Grid>
+                                </Grid>
+                            </ListItem>
+                            <ListItem>
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    color="secondary"
+                                >
+                                    Make a Bid
+                                </Button>
+                            </ListItem>
+                        </List>
+                    </Card>
                 </Grid>
             </Grid>
         </Layout>
