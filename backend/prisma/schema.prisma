@@ -5,36 +5,45 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator erd {
+  provider  = "prisma-erd-generator"
+  output    = "./ERD.png"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model Product {
-  id           Int       @id @default(autoincrement())
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  name         String    @db.VarChar(100)
-  price        Float?    @default(0)
+  id           Int         @id @default(autoincrement())
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  name         String      @db.VarChar(100)
+  price        Float?      @default(0)
   description  String
-  ratings      Float?    @default(0)
+  ratings      Float?      @default(0)
   category     Category
-  seller       String
-  stock        Int?      @default(0)
-  numOfReviews Int?      @default(0)
+  seller       User        @relation(fields: [userId], references: [id])
+  stock        Int?        @default(0)
+  numOfReviews Int?        @default(0)
   reviews      Reviews[]
   images       Images[]
+  userId       Int
+  OrderItem    OrderItem[]
 }
 
 model Reviews {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
   name      String
   ratings   Int
   comment   String
   product   Product  @relation(fields: [productId], references: [id])
   productId Int
+  userId    Int
 }
 
 model Images {
@@ -45,6 +54,56 @@ model Images {
   productId Int
   url       String
   publicId  String
+}
+
+model User {
+  id                  Int       @id @default(autoincrement())
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  name                String    @db.VarChar(30)
+  email               String    @unique
+  password            String
+  products            Product[]
+  role                Role      @default(BUYER)
+  phoneNum            String?
+  dateOfBirth         String?
+  gender              String?
+  address             String?
+  resetPasswordToken  String?
+  resetPasswordExpire DateTime?
+  Order               Order[]
+  Reviews             Reviews[]
+}
+
+model Order {
+  id              Int         @id @default(autoincrement())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  shippingAddress String
+  user            User        @relation(fields: [userId], references: [id])
+  userId          Int
+  orderItems      OrderItem[]
+  totalPrice      Float       @default(0)
+  paidAt          DateTime?
+  orderStatus     OrderStatus @default(Processing)
+  deliveredAt     DateTime?
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  name      String
+  price     Float
+  image     String
+  quantity  Int
+  Order     Order?  @relation(fields: [orderId], references: [id])
+  orderId   Int?
+}
+
+enum Role {
+  ADMIN
+  BUYER
 }
 
 enum Category {
@@ -63,25 +122,8 @@ enum Category {
   Home
 }
 
-model User {
-
-  id                  Int       @id @default(autoincrement())
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-  name                String    @db.VarChar(30)
-  email               String    @unique
-  password            String
-  role                Role      @default(BUYER)
-  phoneNum            String?
-  dateOfBirth         String?
-  gender              String?
-  address             String?
-  resetPasswordToken  String?
-  resetPasswordExpire DateTime?
-
-}
-
-enum Role {
-  ADMIN
-  BUYER
+enum OrderStatus {
+  Processing
+  Shipped
+  Delivered
 }

@@ -1,213 +1,134 @@
-const bcrypt = require("bcrypt");
-const prisma = require("./../db/prisma");
-const jwt = require("jsonwebtoken");
+const bcrypt = require('bcrypt');
+const Joi = require('joi');
+const { ALLOWED_USER_UPDATE } = require('../utils/constants');
+const generateToken = require('../utils/generateToken');
+const sendToken = require('../utils/sendToken');
+const {
+  userValidationSchema,
+  updateUserValidationSchema
+} = require('../utils/userValidationSchema');
+const validUpdate = require('../utils/validUpdate');
+const prisma = require('./../db/prisma');
 
+// ** login -> api/user/login
 //login user by searching email in the db and then comparing password has and password in db
 const login = async (req, res) => {
-    const { Email, Password } = req.body;
+  const { email, password } = req.body;
 
-    try {
-        const user = await prisma.user.findFirst({ where: { Email } });
+  try {
+    // find user by email
+    const user = await prisma.user.findFirst({ where: { email } });
+    if (!user) return res.status(404).send();
 
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        } else {
-            const isValid = await bcrypt.compare(Password, user.Password);
+    // compare password
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) return res.status(400).send({ Error: 'Invalid credentials.' });
 
-            if (!isValid) {
-                res.status(400).json({ message: "Invalid password" });
-            } else {
-                const token = jwt.sign(
-                    {
-                        user_info: {
-                            id: user.id,
-                            Role: user.role,
-                        },
-                    },
-                    process.env.JWT_SECRET,
-                    {
-                        expiresIn: "1h",
-                    }
-                );
-                res.status(200).json({
-                    message: "User logged in successfully",
-                    token,
-                });
-            }
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+    sendToken(res, user, 200);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
+//** Register -> api/user/register
 //getting information from the c;ientr and creating a new user and storing in db
 const register = async (req, res) => {
-    const {
-        FirstName,
-        LastName,
-        Email,
-        Password,
-        DateOfBirth,
-        PhoneNum,
-        Gender,
-        Address,
-    } = req.body;
-    try {
-        if (
-            !FirstName ||
-            !LastName ||
-            !Email ||
-            !Password ||
-            !Address ||
-            !PhoneNum ||
-            !Gender
-        ) {
-            res.status(400).json({ message: "Please fill all the fields" });
-        }
-        const user = await prisma.user.findFirst({ where: { Email } });
-        if (user) {
-            res.status(400).json({ message: "User already exists" });
-        } else {
-            const hashedPassword = await bcrypt.hash(Password, 10);
-            const newUser = await prisma.user.create({
-                data: {
-                    FirstName: FirstName,
-                    LastName: LastName,
-                    Email: Email,
-                    Password: hashedPassword,
-                    DateOfBirth: DateOfBirth,
-                    PhoneNum: PhoneNum,
-                    Gender: Gender,
-                    Address: Address,
-                },
-            });
+  try {
+    // validate data
+    const data = await userValidationSchema.validateAsync(req.body);
 
-            res.status(201).json({
-                message: "User created successfully",
-                newUser,
-            });
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-//getting all users from the db
-const getAllUsers = async (req, res) => {
-    const role = req.user_info.Role;
-    console.log(role);
-    try {
-        if (role === "BUYER") {
-            const users = await prisma.user.findMany();
-            res.status(200).json(users);
-        }
-        else{
-            res.status(401).json({message:"Unauthorized"});
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-//Update users information by searching for the user by email
-const updateUserById = async (req, res) => {
-    const { Email } = req.params;
-    const { FirstName, LastName, DateOfBirth, PhoneNum, Address, Gender } =
-        req.body;
+    // hash password
+    data.password = await bcrypt.hash(data.password, 10);
 
-    try {
-        const user = await prisma.user.findFirst({ where: { Email } });
-        console.log(user);
-        if (!user) {
-            res.status(404).json({ message: "User not found" });
-        } else {
-            const updatedUser = await prisma.user.update({
-                where: {
-                    Email: Email,
-                },
-                data: {
-                    FirstName: FirstName,
-                    LastName: LastName,
-                    DateOfBirth: DateOfBirth,
-                    PhoneNum: PhoneNum,
-                    Address: Address,
-                    Gender: Gender,
-                },
-            });
-            res.status(200).json({
-                message: "User updated successfully",
-                updatedUser,
-            });
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+    // create user
+    const user = await prisma.user.create({ data });
+
+    sendToken(res, user, 201);
+  } catch (error) {
+    if (error.code === 'P2002') return res.status(400).send({ Error: 'Email taken!' });
+    res.status(500).json({
+      Error: error.message
+    });
+  }
 };
-//Delete user by searching for the user by email
-const deleteUserById = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const user = await prisma.user.findFirst({ where: { id } });
-        if (!user) {
-            res.status(404).json({ message: "User not found" });
-        } else {
-            await prisma.user.delete({ where: { id: id } });
-            res.status(200).json({ message: "User deleted successfully" });
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+
+//** logout -> api/user/logout
+const logout = async (req, res) => {
+  res.cookie('token', null, { expires: new Date(Date.now()), httpOnly: true });
+  res.status(200).send('logged out');
 };
-// updating user information by searching for the user by id from token
-const updateUserInfo = async (req, res) => {
-    const id = req.user_info.id;
-    const {
-        FirstName,
-        LastName,
-        DateOfBirth,
-        PhoneNum,
-        Password,
-        Address,
-        Gender,
-        Email,
-    } = req.body;
-    const hashedPassword = await bcrypt.hash(Password, 10);
-    try {
-        const user = await prisma.user.findFirst({ where: { id: id } });
-        if (!user) {
-            res.status(404).json({ message: "User not found" });
-            return;
-        } else {
-            console.log("eije user:", user, "id:", id);
-            const updatedUser = await prisma.user.update({
-                where: {
-                    id: id,
-                },
-                data: {
-                    FirstName: FirstName,
-                    LastName: LastName,
-                    DateOfBirth: DateOfBirth,
-                    PhoneNum: PhoneNum,
-                    Address: Address,
-                    Email: Email,
-                    Password: hashedPassword,
-                    Gender: Gender,
-                },
-            });
-            console.log("helloo");
-            res.status(201).json({
-                message: "User updated successfully",
-                updatedUser,
-            });
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+
+//** get user profile -> api/user/me
+const getUserProfile = async (req, res) => {
+  try {
+    const user = await prisma.user.findFirst({ where: { id: req.user.id } });
+
+    // delete password field from user body
+    delete user.password;
+
+    res.status(200).json({ user });
+  } catch (error) {
+    res.status(500).json({ Error: error.message });
+  }
+};
+
+//**  update password -> api/user/password/update
+const updatePassword = async (req, res) => {
+  try {
+    // validating the request body
+    let { oldPassword, newPassword } = await Joi.object({
+      oldPassword: Joi.string()
+        .min(6)
+        .pattern(/^[a-zA-Z0-9]{3,30}$/)
+        .required(),
+      newPassword: Joi.string()
+        .min(6)
+        .pattern(/^[a-zA-Z0-9]{3,30}$/)
+        .required()
+    }).validateAsync(req.body);
+
+    // checking the old password
+    const isValid = await bcrypt.compare(oldPassword, req.user.password);
+    if (!isValid) return res.status(400).send({ Error: 'Invalid credentials.' });
+
+    // hashing new password
+    newPassword = await bcrypt.hash(newPassword, 10);
+
+    // setting the new password
+    const user = await prisma.user.update({
+      where: { id: req.user.id },
+      data: { password: newPassword }
+    });
+
+    // sending new token after updating password
+    sendToken(res, user, 201);
+  } catch (error) {
+    res.status(500).json({ Error: error.message });
+  }
+};
+
+//** update user profile -> api/user/update/me
+const updateUserProfile = async (req, res) => {
+  if (!validUpdate(req, ALLOWED_USER_UPDATE))
+    return res.status(400).send({ Error: 'Invalid updates' });
+
+  try {
+    const data = await updateUserValidationSchema.validateAsync(req.body);
+    const user = await prisma.user.update({
+      where: { id: req.user.id },
+      data
+    });
+    res.status(201).send(user);
+  } catch (error) {
+    res.status(500).json({ Error: error.message });
+  }
 };
 
 module.exports = {
-    login,
-    register,
-    getAllUsers,
-    updateUserById,
-    deleteUserById,
-    updateUserInfo,
+  login,
+  register,
+  logout,
+  updateUserProfile,
+  getUserProfile,
+  updatePassword
 };
