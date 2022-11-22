@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   // ... you will write your Prisma Client queries here
-  await prisma.user.deleteMany({});
+  // await prisma.user.deleteMany({});
   const users = await prisma.user.createMany({ data: user });
   console.log(users);
 }
