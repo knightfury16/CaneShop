@@ -10,14 +10,15 @@ import {
 } from '@material-ui/core';
 import useStyles from '../utils/style.js';
 
-const Layout = ({title, children }) => {
+const Layout = ({ title, description, children }) => {
     const classes = useStyles();
     return (
         <div>
             <Head>
-                <title>
-                    {title ? `${title} - Next Amazona` : 'Next Amazona'}
-                </title>
+                <title>{title ? `${title} - CaneShop` : 'CaneShop'}</title>
+                {description && (
+                    <meta name="description" content={description}></meta>
+                )}
             </Head>
             <AppBar position="static" className={classes.navbar}>
                 <Toolbar>
@@ -42,7 +43,7 @@ const Layout = ({title, children }) => {
             <Container className={classes.main}>{children}</Container>
             <footer className={classes.footer}>
                 <Typography className={classes.foot}>
-                    Developed By Abidstic
+                    All rights reserved. CaneShop
                 </Typography>
             </footer>
         </div>

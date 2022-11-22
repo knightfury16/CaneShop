@@ -45,7 +45,7 @@ export default function Home() {
                                             ${product.price}
                                         </Typography>
                                         <Button size="medium" color="secondary">
-                                            Add to Cart{' '}
+                                            Make a BID{' '}
                                         </Button>
                                     </CardActions>
                                 </NextLink>
