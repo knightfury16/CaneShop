@@ -1,4 +1,5 @@
 import { makeStyles } from '@material-ui/core';
+import { red, yellow } from '@material-ui/core/colors';
 
 const useStyles = makeStyles({
     navbar: {
@@ -33,5 +34,28 @@ const useStyles = makeStyles({
         fontSize: '1.5rem',
         fontWeight: 'bold',
     },
+    paper:{
+        padding: 20,
+        height:'70vh',
+        width: 480,
+        margin: "20px auto"
+    },
+    email:{
+        margin:"10px 0"
+    },
+    password:{
+        margin:"10px 0"
+    },
+    submit:{
+        margin:"10px 0"
+    },
+    forgot_password:{
+        margin:"10px 0",
+        color: red[700]
+    },
+    register:{
+        margin:"10px 0",
+        color: red[700]
+    }
 });
 export default useStyles;

@@ -6,7 +6,12 @@ export default class MyDocument extends Documnet {
     render() {
         return (
             <Html lang="en">
-                <Head></Head>
+                <Head>
+                    <link
+                        rel="stylesheet"
+                        href="https://fonts.googleapis.com/css2?family=PT+Sans+Narrow&family=Roboto+Slab:100,200,300,500,600,700,800,900&display=swap"
+                    />
+                </Head>
                 <body>
                     <Main />
                     <NextScript />
