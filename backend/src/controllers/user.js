@@ -91,7 +91,7 @@ const register = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
+//getting all users from the db
 const getAllUsers = async (req, res) => {
     const role = req.user_info.Role;
     console.log(role);
@@ -99,8 +99,9 @@ const getAllUsers = async (req, res) => {
         if (role === "BUYER") {
             const users = await prisma.user.findMany();
             res.status(200).json(users);
-        } else {
-            res.status(401).json({ message: "Unauthorized" });
+        }
+        else{
+            res.status(401).json({message:"Unauthorized"});
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
