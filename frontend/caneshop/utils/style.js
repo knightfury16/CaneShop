@@ -37,13 +37,19 @@ const useStyles = makeStyles({
     paper:{
         padding: 20,
         height:'70vh',
-        width: 480,
+        width: 420,
         margin: "20px auto"
     },
     email:{
         margin:"10px 0"
     },
     password:{
+        margin:"10px 0"
+    },
+    address:{
+        margin:"10px 0"
+    },
+    phoneNo:{
         margin:"10px 0"
     },
     submit:{
@@ -56,6 +62,9 @@ const useStyles = makeStyles({
     register:{
         margin:"10px 0",
         color: red[700]
-    }
+    },
+    signin:{
+        margin:"10px 0",
+    },
 });
 export default useStyles;
