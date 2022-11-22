@@ -10,6 +10,9 @@ a {
     color: inherit;
     text-decoration: none;
 }
+.MuiFormHelperText-root{
+  color: red !important;
+}
 
 * {
     box-sizing: border-box;

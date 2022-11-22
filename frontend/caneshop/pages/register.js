@@ -3,8 +3,6 @@ import {
     Grid,
     Paper,
     TextField,
-    FormControlLabel,
-    Checkbox,
     Button,
     Typography,
     List,
