@@ -26,6 +26,7 @@ router.get('/:id', getSingleProduct);
 
 //** create product
 // !Auth2
+
 router.post('/new', auth, authorizeRole(AUTHORIZED_ROLES), createProduct);
 
 //** update single product by id

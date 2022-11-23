@@ -7,6 +7,7 @@ async function main() {
   // ... you will write your Prisma Client queries here
   await prisma.product.deleteMany({});
   const products = await prisma.product.createMany({ data: product });
+  prisma.product.create({data:{}})
   console.log(products);
 }
 

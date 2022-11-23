@@ -35,36 +35,38 @@ const useStyles = makeStyles({
         fontWeight: 'bold',
     },
     paper:{
-        padding: 20,
-        height:'70vh',
+        padding: 10,
+        height:'80vh',
         width: 420,
-        margin: "20px auto"
+        margin: "15px auto"
     },
     email:{
-        margin:"10px 0"
+        margin:"5px 0"
     },
     password:{
-        margin:"10px 0"
+        margin:"5px 0"
     },
     address:{
-        margin:"10px 0"
+        margin:"5px 0"
     },
     phoneNo:{
-        margin:"10px 0"
+        margin:"5px 0"
     },
     submit:{
-        margin:"10px 0"
+        margin:"5px 0"
     },
     forgot_password:{
-        margin:"10px 0",
+        margin:"5px 0",
         color: red[700]
     },
     register:{
-        margin:"10px 0",
+        margin:"5px 0",
         color: red[700]
     },
     signin:{
-        margin:"10px 0",
+        margin:"5px 0",
+        textAlign: 'center',
     },
+
 });
 export default useStyles;

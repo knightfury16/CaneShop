@@ -8,6 +8,9 @@ import {
     List,
     ListItem,
     Link,
+    Select,
+    MenuItem,
+    Box,
 } from '@material-ui/core';
 import React from 'react';
 import NextLink from 'next/link';
@@ -61,6 +64,17 @@ const LogIn = () => {
                         </ListItem>
                         <ListItem>
                             <TextField
+                                label="Confirm Password"
+                                placeholder="Enter your password"
+                                variant="outlined"
+                                type="password"
+                                fullWidth
+                                required
+                                className={classes.confirmpassword}
+                            />
+                        </ListItem>
+                        <ListItem>
+                            <TextField
                                 className={classes.phoneNo}
                                 label="Phone Number"
                                 placeholder="Enter your phone number"
@@ -79,6 +93,19 @@ const LogIn = () => {
                                 required
                             />
                         </ListItem>
+                        <ListItem>
+                            <TextField
+                                className={classes.dob}
+                                label="Date of Birth"
+                                placeholder="Enter your date of birth"
+                                variant="outlined"
+                                fullWidth
+                                type="date"
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                            />
+                        </ListItem>
                     </List>
                     <Button
                         variant="contained"
@@ -89,15 +116,11 @@ const LogIn = () => {
                     >
                         Sign Up
                     </Button>
-                    <Typography>
-                        <NextLink
-                            href="/login"
-                            passHref
-                            className={classes.signin}
-                        >
+                    <Box className={classes.signin}>
+                        <NextLink href="/login" passHref>
                             <Link>Sign In</Link>
                         </NextLink>
-                    </Typography>
+                    </Box>
                 </Paper>
             </Grid>
         </Layout>

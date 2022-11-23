@@ -7,15 +7,16 @@ import {
     Toolbar,
     Typography,
     Link,
-    createMuiTheme,
     ThemeProvider,
     CssBaseline,
+    Box,
 } from '@material-ui/core';
+import { createTheme } from '@material-ui/core/styles';
 
 import useStyles from '../utils/style.js';
 
 const Layout = ({ title, description, children }) => {
-    const theme = createMuiTheme({
+    const theme = createTheme({
         typography: {
             h1: {
                 fontSize: '1.6rem',
@@ -45,12 +46,7 @@ const Layout = ({ title, description, children }) => {
                     <Toolbar>
                         <NextLink href="/" passHref>
                             <Link>
-                                <Typography
-                                    className={classes.brand}
-                                    variant="h4"
-                                >
-                                    {title?title : 'CaneShop'}
-                                </Typography>
+                                <Box className={classes.brand}>{title ? title : 'CaneShop'}</Box>
                             </Link>
                         </NextLink>
                         <div className={classes.grow}></div>
@@ -66,9 +62,9 @@ const Layout = ({ title, description, children }) => {
                 </AppBar>
                 <Container className={classes.main}>{children}</Container>
                 <footer className={classes.footer}>
-                    <Typography className={classes.foot}>
+                    <Box className={classes.foot}>
                         All rights reserved. CaneShop
-                    </Typography>
+                    </Box>
                 </footer>
             </ThemeProvider>
         </div>
