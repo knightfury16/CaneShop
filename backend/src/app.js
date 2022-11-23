@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
+const cors = require('cors');
 const userRoute = require('../src/routers/user');
 const productRouter = require('./routers/product');
 const adminRoute = require('./routers/admin');
@@ -11,6 +12,7 @@ const app = express();
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors());
 
 app.get('/', (req, res) => {
   res.json({ message: 'Server Running ' });

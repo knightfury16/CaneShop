@@ -10,6 +10,7 @@ import {
     List,
     ListItem,
     Link,
+    Box,
 } from '@material-ui/core';
 import React from 'react';
 import NextLink from 'next/link';
@@ -32,6 +33,7 @@ const LogIn = () => {
             props.resetForm();
             props.setSubmitting(false);
         },2000);
+        
     };
     const validationSchema = Yup.object().shape({
         email: Yup.string()
@@ -112,12 +114,12 @@ const LogIn = () => {
                         )}
                     </Formik>
 
-                    <Typography className={classes.forgot_password}>
+                    <Box className={classes.forgot_password}>
                         <NextLink href="/password" passHref>
                             <Link>Forgot Password?</Link>
                         </NextLink>
-                    </Typography>
-                    <Typography>
+                    </Box>
+                    <Box>
                         Do you have an account? &nbsp;
                         <NextLink
                             href="/register"
@@ -126,7 +128,7 @@ const LogIn = () => {
                         >
                             <Link>Register</Link>
                         </NextLink>
-                    </Typography>
+                    </Box>
                 </Paper>
             </Grid>
         </Layout>

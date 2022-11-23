@@ -11,11 +11,24 @@ import {
 
 import Layout from '../components/Layout';
 
-import data from '../utils/data';
+// import data from '../utils/data';
 
 import NextLink from 'next/link';
 
-export default function Home() {
+export const getStaticProps = async () => {
+    const res = await fetch('http://localhost:4000/api/products');
+    const data = await res.json();
+
+    return {
+        props: {
+            data
+        },
+    };
+};
+
+export default function Home({ data }) {
+    
+
     return (
         <Layout>
             <div>
@@ -25,13 +38,13 @@ export default function Home() {
                         <Grid item md={4} key={product.name}>
                             <Card>
                                 <NextLink
-                                    href={`/product/${product.slug}`}
+                                    href={`/product/${product.id}`}
                                     passHref
                                 >
                                     <CardActionArea>
                                         <CardMedia
                                             component="img"
-                                            image={product.image}
+                                            image="/images/chair.jpg"
                                             title={product.name}
                                         ></CardMedia>
                                         <CardContent>
